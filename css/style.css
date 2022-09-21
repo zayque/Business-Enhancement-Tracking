@@ -1,0 +1,25 @@
+.content{
+    width:auto;
+    height:auto;
+    margin-top: 40px;
+    margin-left: 10%;
+}
+.a{
+    border: 1px solid black;
+}
+table{
+    font-size: 13px;
+  
+
+}
+
+.side-content{
+    width: 75%;
+    height: auto;
+    margin-left: 10%;
+    font-size: 21px;
+    border: 1px solid black;
+}
+
+
+
