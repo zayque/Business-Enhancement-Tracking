@@ -41,7 +41,7 @@ CREATE TABLE `login` (
 INSERT INTO `login` (`sysid`, `fullname`, `staff_id`, `password`) VALUES
 (1, 'hashim akmal Kamarul', '123acva', '12389kaa'),
 (2, 'Megat', 'ahs1234', '321aca'),
-(3, 'tuti', '1234abn', 'adjn21'),
+(3, 'Abu', '1234abn', 'adjn21'),
 (5, 'usop', 'abcjk12', '131ls'),
 (6, 'cong', 'bhkjd12', 'abhsk14'),
 (7, 'widad rusli', 'abcj1243', 'fdsf342');
@@ -92,7 +92,7 @@ INSERT INTO `user` (`sysid`, `registered_by`, `workstream`, `ws_code`, `develope
 (2, 'hashim akmal Kamarul', 'gfhfghfgh', 'adsasd', 'GNT,NROAin,', 'SVP2Waiters Clearence', 'adssad', 'rewrwe', 'dwqwq', 'Assessment', '2022-03-04', '2022-03-17', '2022-03-24', '2022-04-07', '2022-03-25', '2022-04-07', 'dwqqd', '2', '2', '', '1', '2', '1', '', '1', 'Testsdd', '2022-03-01 07:54:53.33938', '2022-03-05 14:36:30.3063', 'Megat'),
 (3, 'hashim akmal Kamarul', 'adassdasadads', 'adsasd', 'NRO-Megat,NRO-Ain,', 'Service Installation SVP10-ND Digital NMO', '65332', 'ewqqweqe', 'fesw', 'Completed', '2022-03-16', '2022-03-09', '2022-03-09', '2022-03-17', '2022-03-30', '2022-04-06', 'rwewr', '1', '2', '', '232', '3', '1', '', '424', 'Last Stand Standing', '2022-03-01 07:57:45.62013', '2022-03-06 12:15:30.1350', 'Megat'),
 (4, 'hashim akmal Kamarul', 'ewqe', '432432', 'GNT,NRO-Ain,', 'SVP2-Waiters Clearence', 'adssad', 'rewrwe', 'dwqwq', 'Assessment', '2022-04-02', '2022-03-25', '2022-03-17', '2022-03-24', '2022-03-23', '2022-03-31', 'dwqqd', '1', '3', '', '44', '5', '1', '', '6', 'Helooo', '2022-03-01 08:17:01.47082', '2022-03-06 13:58:49.4885', 'hashim akmal Kamarul'),
-(5, 'tuti', 'qweqwe', '432432', 'GITD,GNT,NRO-Megat,NRO-Ain,', 'SVP3-Accelerate', 'eqweqwe', 'sadasd', 'qweqe', 'Completed', '2022-03-30', '2022-03-19', '2022-03-24', '2022-03-07', '2022-04-09', '2022-04-06', 'qewqweqwe', '1', '2', '800.00', '0', '3', '1', '2400.00', '0', '', '2022-03-02 08:54:47.46106', NULL, '');
+(5, 'Abu', 'qweqwe', '432432', 'GITD,GNT,NRO-Megat,NRO-Ain,', 'SVP3-Accelerate', 'eqweqwe', 'sadasd', 'qweqe', 'Completed', '2022-03-30', '2022-03-19', '2022-03-24', '2022-03-07', '2022-04-09', '2022-04-06', 'qewqweqwe', '1', '2', '800.00', '0', '3', '1', '2400.00', '0', '', '2022-03-02 08:54:47.46106', NULL, '');
 
 --
 -- Indexes for dumped tables

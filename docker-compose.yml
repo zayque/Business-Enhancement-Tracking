@@ -1,0 +1,52 @@
+name: be-tracker
+
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-be_tracking}
+      MARIADB_USER: ${DB_USER:-betracker}
+      MARIADB_PASSWORD: ${DB_PASS:-betracker}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASS:-rootsecret}
+      TZ: Asia/Kuala_Lumpur
+    ports:
+      - "${DB_PORT:-3307}:3306"   # host 3307 avoids clashing with a local XAMPP MySQL
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d:ro   # seeds schema + sample data on first start
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-be_tracking}
+      DB_USER: ${DB_USER:-betracker}
+      DB_PASS: ${DB_PASS:-betracker}
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+
+  adminer:
+    image: adminer:4.8.1
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "${ADMINER_PORT:-8081}:8080"
+    depends_on:
+      - db
+
+volumes:
+  db_data:

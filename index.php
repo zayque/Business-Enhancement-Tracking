@@ -1,132 +1,126 @@
-    <?php
+<?php
+declare(strict_types=1);
+require __DIR__ . '/includes/bootstrap.php';
+require __DIR__ . '/includes/layout.php';
 
-            include('login.php'); // Includes Login Script
-            if(isset($_SESSION['login_user'])){
-            header("location: dashboard.php"); // Redirecting To Profile Page
+if (current_user()) {
+    redirect('dashboard.php');
+}
+
+$error = '';
+$staffId = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf();
+    $staffId = trim((string) ($_POST['staff_id'] ?? ''));
+    $password = (string) ($_POST['password'] ?? '');
+
+    if ($staffId === '' || $password === '') {
+        $error = 'Please enter your Staff ID and password.';
+    } else {
+        $stmt = db()->prepare('SELECT sysid, fullname, staff_id, password FROM login WHERE staff_id = ? LIMIT 1');
+        $stmt->execute([$staffId]);
+        $row = $stmt->fetch();
+
+        $stored = $row['password'] ?? '';
+        $isHash = str_starts_with($stored, '$2y$') || str_starts_with($stored, '$argon2');
+        $valid = $row && ($isHash ? password_verify($password, $stored) : hash_equals($stored, $password));
+
+        if ($valid) {
+            // Transparently upgrade legacy plain-text passwords to secure hashes.
+            if (!$isHash || password_needs_rehash($stored, PASSWORD_DEFAULT)) {
+                db()->prepare('UPDATE login SET password = ? WHERE sysid = ?')
+                    ->execute([password_hash($password, PASSWORD_DEFAULT), $row['sysid']]);
             }
-
-    ?>
-
-    <!DOCTYPE html>
-    <html>
-
-    <head>
-        <title>BE Tracker</title>
-
-
-        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="css/Login_page.css">
-
-
-        <script type="text/javascript">
-        window.history.forward();
-
-        function noBack() {
-            window.history.forward();
+            session_regenerate_id(true);
+            $_SESSION['user'] = ['id' => (int) $row['sysid'], 'fullname' => $row['fullname'], 'staff_id' => $row['staff_id']];
+            flash('success', 'Welcome back, ' . ucwords($row['fullname']) . '!');
+            redirect('dashboard.php');
         }
-        </script>
-
-        <?php
-        if(isset($_SESSION['login_msg']) && $_SESSION['login_msg'] != ""){
-            echo '<script> alert("' . $_SESSION['login_msg'] . '"); </script>';
-           //$_SESSION['login_msg'] = "";
-        }
-    ?>
-
-    </head>
-
-    <style>
-body {
-    background: linear-gradient(to right, #fff 18%, #f08303 50%);
+        $error = 'Staff ID or password is incorrect.';
+    }
 }
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <?php head_tags('Sign in'); ?>
+    <link href="<?= e(asset('css/app.css')) ?>" rel="stylesheet">
+</head>
+<body>
+<div class="auth-page">
+    <section class="auth-hero">
+        <a class="brand" href="index.php">
+            <?= brand_mark(42) ?>
+            <span><strong><?= e(APP_NAME) ?></strong><small><?= e(APP_FULL_NAME) ?></small></span>
+        </a>
 
-.wrap-login::before,
-.wrap-login::after {
-    display: block;
-    content: "";
-    clear: both;
-}
+        <h1>Every enhancement, from idea to rollout.</h1>
+        <p class="lead">Track business enhancement requests, delivery milestones and man-day costs in one clean workspace.</p>
 
-.responsive {
-    width: 100%;
-    height: auto;
-}
+        <ul class="auth-features">
+            <li><i class="bi bi-kanban"></i> Seven-stage delivery pipeline</li>
+            <li><i class="bi bi-calendar2-check"></i> RFS &amp; rollout date tracking</li>
+            <li><i class="bi bi-cash-coin"></i> Automatic internal cost calculation</li>
+        </ul>
 
-#btnlgn:hover {
-    color: white;
-    background-color: orange;
-}
-    </style>
-
-    <body onload="noBack();" onpageshow="if (event.persisted) noBack();" onunload="">
-
-        <div class="container">
-            <div style="width:50%; height:700px; position:relative; margin:0px auto; margin-top:20%;">
-                 <div class="text-center">
-                 <img src="img/logo.png">
-                    <!-- <h2 style="font-family: Arial, Helvetica, sans-serif; color:white">BE Tracking</h2> -->
-                </div>
-                <br>
-                <div>
-                    <!-- <div style="width:50%; position:absolute; left:50%; top:50%; transform: translate(-50%, 50%)"> -->
-                    <div class="wrap-login col-lg-12">
-                        <h3 class="text-center">Business Enhancement Tracking</h3>
-                        <br>
-                        <form action="" method="POST">
-                            <div class="form-group">
-                                <label for="email">Staff ID</label>
-                                <input name="staff_id" type="text" class="form-control" id="email"
-                                    placeholder="Username"
-                                    value="<?php if(isset($_POST['submit'])){echo $_POST['staff_id']; } ?>">
-                            </div>
-                            <div class="form-group">
-                                <label for="password">Password</label>
-                                <input name="password" type="password" class="form-control" id="myInput"
-                                    placeholder="Password"
-                                    value="<?php if(isset($_POST['submit'])){echo $_POST['password']; } ?>">
-                                &nbsp<input type="checkbox" onclick="myFunction()">&nbsp <a style="color:black">Show
-                                    Password</a>
-                            </div>
-                            <input id="btnlgn" type="submit" class="btn btn-block" value="Login" name="submit"></input>
-                        </form>
-                        <!-- <center style="margin-top:25px;"><a href="index.php">Back to main</a></center> -->
-                    </div>
-                </div>
-
-            </div>
+        <div class="auth-float d-none d-xl-block" aria-hidden="true">
+            <div class="d-flex justify-content-between small fw-semibold"><span>Pipeline health</span><span>72%</span></div>
+            <div class="mini-bar"><span style="width:72%"></span></div>
+            <div class="d-flex justify-content-between small fw-semibold mt-3"><span>Completed this quarter</span><span>18</span></div>
+            <div class="mini-bar"><span style="width:54%"></span></div>
         </div>
 
-        <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
-        </script> -->
-        <script src="js/jquery-3.2.1.slim.min.js"></script>
-        <script src="js/popper.min.js"></script>
-        <script src="js/popper.min.js"></script>
-        <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
-            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous">
-        </script> -->
+        <small class="copy">&copy; <?= date('Y') ?> <?= e(APP_FULL_NAME) ?></small>
+    </section>
 
-        <script>
-        $('.js-tilt').tilt({
-            scale: 1.1
-        })
+    <section class="auth-form-wrap position-relative">
+        <button type="button" class="btn btn-icon auth-theme" data-theme-toggle aria-label="Toggle theme">
+            <i class="bi bi-moon-stars theme-icon-light"></i><i class="bi bi-sun theme-icon-dark"></i>
+        </button>
 
-        function myFunction() {
-            var x = document.getElementById("myInput");
-            if (x.type === "password") {
-                x.type = "text";
-            } else {
-                x.type = "password";
-            }
-        }
-        </script>
+        <div class="auth-card fade-up">
+            <span class="eyebrow"><i class="bi bi-shield-lock"></i> Secure sign in</span>
+            <h2 class="mb-1">Welcome back</h2>
+            <p class="text-muted mb-4">Sign in with your staff credentials to continue.</p>
 
-    </body>
+            <?php foreach (take_flashes() as $f): ?>
+                <div class="alert alert-<?= e($f['type']) ?> border-0 rounded-3 py-2 small"><?= e($f['message']) ?></div>
+            <?php endforeach; ?>
+            <?php if ($error): ?>
+                <div class="alert alert-danger border-0 rounded-3 d-flex align-items-center gap-2 py-2 small" role="alert">
+                    <i class="bi bi-exclamation-circle-fill"></i><?= e($error) ?>
+                </div>
+            <?php endif; ?>
 
-
-    <div class="footer-copyright text-center py-3">© 2022 Copyright:
-        <a href="">Telekom Malaysia</a>
-    </div>
-    <br>
-
-    </html>
+            <form method="post" novalidate>
+                <?= csrf_field() ?>
+                <div class="mb-3">
+                    <label class="form-label" for="staff_id">Staff ID</label>
+                    <div class="auth-input">
+                        <i class="bi bi-person-badge"></i>
+                        <input class="form-control" id="staff_id" name="staff_id" autocomplete="username"
+                               placeholder="e.g. 1234abn" value="<?= e($staffId) ?>" required autofocus>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="auth-input">
+                        <i class="bi bi-lock"></i>
+                        <input class="form-control" type="password" id="password" name="password"
+                               autocomplete="current-password" placeholder="••••••••" required>
+                        <button type="button" class="btn btn-icon toggle-pw" data-toggle-password="password" aria-label="Show password">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg w-100" type="submit">
+                    Sign in <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+</div>
+<script src="<?= e(asset('js/app.js')) ?>"></script>
+</body>
+</html>
