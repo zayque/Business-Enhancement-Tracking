@@ -84,6 +84,9 @@
   if (!tableEl || !window.DataTable) return;
 
   var selected = new Set();
+  // Declared before the table is built: DataTables calls drawCallback during construction.
+  var bulkBar = document.getElementById('bulkBar');
+  var checkAll = document.getElementById('checkAll');
 
   var table = new DataTable(tableEl, {
     data: jobs,
@@ -198,9 +201,6 @@
   });
 
   /* ---------- Selection & bulk delete ---------- */
-  var bulkBar = document.getElementById('bulkBar');
-  var checkAll = document.getElementById('checkAll');
-
   function syncBulk() {
     document.getElementById('bulkCount').textContent = selected.size;
     bulkBar.classList.toggle('show', selected.size > 0);

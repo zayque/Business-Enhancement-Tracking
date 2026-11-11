@@ -393,6 +393,12 @@ div.dt-container .dt-length label { color: var(--app-muted); font-size: .85rem; 
 @media (min-width: 768px) and (max-width: 1199.98px), (min-width: 1600px) {
   .cost-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+@media (max-width: 575.98px) {
+  /* Give the RM amount columns more room than the man-day inputs on phones. */
+  .cost-row { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: .6rem; padding: .85rem; }
+  .cost-row .input-group-text { padding: 0 .55rem; }
+  .cost-row .form-control { padding-left: .6rem; padding-right: .6rem; }
+}
 
 /* Summary side card */
 .summary-card { position: sticky; top: 1.5rem; }
